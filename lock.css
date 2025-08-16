@@ -1,0 +1,92 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  font-family: Segoe UI, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url(https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?cs=srgb&dl=pexels-quang-nguyen-vinh-222549-2166711.jpg&fm=jpg);
+  position: relative;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Center login box */
+.login-container {
+  text-align: center;
+}
+
+.avatar {
+  width: 120px;
+  height: 12  0px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  border: 2px solid #999;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.password-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.password-row input {
+  padding: 10px;
+  font-size: 16px;
+  width: 240px;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+
+.go {
+  padding: 10px 14px;
+  border: 1px solid #666;
+  background: #f3f3f3;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.go:hover {
+  background: #ddd;
+}
+
+/* Bottom bar - now on right */
+.bottom-bar {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.bottom-bar .lang {
+  font-size: 14px;
+  margin-right: 20px;
+}
+
+.bottom-bar .icons i {
+  margin-right: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: white;
+}
+.bottom-bar .icons i:hover {
+  transform: scale(1.2);
+  color: #0078d7; /* Windows blue */
+}
