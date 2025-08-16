@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Browser File Explorer</title>
+<style>
+  :root { --bg:#f4f5f7; --panel:#fff; --line:#e5e7eb; --text:#0f172a; --muted:#64748b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Segoe UI, system-ui, -apple-system, Arial, sans-serif; color:var(--text); background:linear-gradient(#fafafa, #f0f0f0); }
+  .app { display:flex; height:100vh; }
+  .sidebar { width:240px; border-right:1px solid var(--line); background:#f7f7f8; padding:10px; }
+  .side-head { font-size:12px; color:var(--muted); margin:12px 8px 6px; }
+  .side-item { padding:8px 10px; border-radius:8px; cursor:pointer; }
+  .side-item:hover { background:#eceff3; }
+  .main { flex:1; display:flex; flex-direction:column; }
+  .toolbar { display:flex; gap:8px; align-items:center; padding:10px; border-bottom:1px solid var(--line); background:#fafafa; }
+  .btn { padding:8px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; cursor:pointer; }
+  .btn:hover { box-shadow:0 1px 6px rgba(0,0,0,.06); }
+  .path { flex:1; display:flex; gap:6px; align-items:center; overflow:auto; }
+  .crumb { padding:6px 10px; border:1px solid var(--line); background:#fff; border-radius:10px; white-space:nowrap; cursor:pointer; }
+  .search { display:flex; gap:6px; }
+  .input { padding:8px 10px; border:1px solid var(--line); border-radius:10px; min-width:220px; }
+  .table-wrap { flex:1; overflow:auto; background:var(--panel); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  thead th { position:sticky; top:0; background:#f3f4f6; border-bottom:1px solid var(--line); text-align:left; padding:10px; font-weight:600; color:#334155; }
+  tbody td { border-bottom:1px solid #f2f2f2; padding:10px; }
+  tr:hover { background:#fafafa; }
+  .name { display:flex; gap:10px; align-items:center; }
+  .icon { width:18px; text-align:center; }
+  .muted { color:var(--muted); }
+  .right { text-align:right; }
+  .empty { padding:30px; color:var(--muted); }
+  .warning { padding:10px 12px; color:#b91c1c; background:#fee2e2; border:1px solid #fecaca; border-radius:10px; margin:10px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar (visual only) -->
+  <aside class="sidebar">
+    <div class="side-head">Quick access</div>
+    <div class="side-item">📄 Desktop</div>
+    <div class="side-item">⬇️ Downloads</div>
+    <div class="side-item">📁 Documents</div>
+    <div class="side-item">🖼️ Pictures</div>
+    <div class="side-head">This PC</div>
+    <div class="side-item">💻 This PC</div>
+    <div class="side-item">🌐 Network</div>
+  </aside>
+
+  <!-- Main -->
+  <section class="main">
+    <div id="compatNotice" class="warning" style="display:none">
+      Your browser needs the File System Access API (Chrome/Edge). Also open this page on HTTPS or http://localhost.
+    </div>
+
+    <div class="toolbar">
+      <button id="pickBtn" class="btn">Open Folder</button>
+      <div id="path" class="path"></div>
+      <div class="search">
+        <input id="query" class="input" placeholder="Search (current folder)" />
+        <button id="searchBtn" class="btn">Search</button>
+        <button id="clearBtn" class="btn">Clear</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:48%">Name</th>
+            <th style="width:16%">Type</th>
+            <th class="right" style="width:12%">Size</th>
+            <th style="width:24%">Date modified</th>
+            <th class="right" style="width:10%">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td class="empty" colspan="5">Click “Open Folder” to begin.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+  // ---- Capability check ----
+  const supportsFS = 'showDirectoryPicker' in window;
+  if (!supportsFS || (location.protocol !== 'https:' && location.hostname !== 'localhost')) {
+    document.getElementById('compatNotice').style.display = '';
+  }
+
+  // ---- State ----
+  /** @type {FileSystemDirectoryHandle|null} */
+  let rootHandle = null;
+  let currentHandle = null;
+  let breadcrumb = []; // array of {name, handle}
+  let currentEntries = []; // cached entries in current folder
+  let filterText = "";
+
+  // ---- Helpers ----
+  async function listDir(dirHandle) {
+    const items = [];
+    // for-await works on directory handles
+    for await (const [name, handle] of dirHandle.entries()) {
+      const entry = { name, kind: handle.kind, handle };
+      if (handle.kind === 'file') {
+        try {
+          const file = await handle.getFile();
+          entry.size = file.size;
+          entry.mtime = file.lastModified;
+          entry.type = file.type || extToType(name);
+        } catch { /* permission or transient error */ }
+      } else {
+        entry.type = 'Folder';
+      }
+      items.push(entry);
+    }
+    // sort: folders first, then files, alphabetical
+    items.sort((a,b) => (a.kind===b.kind ? a.name.localeCompare(b.name) : a.kind==='directory' ? -1 : 1));
+    return items;
+  }
+
+  function extToType(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    const map = { pdf:'PDF', jpg:'JPEG Image', jpeg:'JPEG Image', png:'PNG Image',
+                  gif:'GIF Image', txt:'Text Document', md:'Markdown', html:'HTML Document',
+                  js:'JavaScript', css:'CSS', json:'JSON', zip:'ZIP', rar:'RAR' };
+    return map[ext] || 'File';
+  }
+
+  function fmtSize(n) {
+    if (!Number.isFinite(n)) return '';
+    if (n < 1024) return `${n} B`;
+    const u = ['KB','MB','GB','TB']; let i= -1;
+    do { n/=1024; i++; } while (n>=1024 && i<u.length-1);
+    return `${n.toFixed(1)} ${u[i]}`;
+  }
+
+  function fmtDate(ms) {
+    if (!ms) return '';
+    const d = new Date(ms);
+    return d.toLocaleString();
+  }
+
+  function renderPath() {
+    const pathEl = document.getElementById('path');
+    pathEl.innerHTML = '';
+    breadcrumb.forEach((seg, i) => {
+      const b = document.createElement('button');
+      b.className = 'crumb';
+      b.textContent = seg.name || 'Root';
+      b.onclick = () => openDirIndex(i);
+      pathEl.appendChild(b);
+    });
+  }
+
+  function renderRows() {
+    const tbody = document.getElementById('rows');
+    tbody.innerHTML = '';
+    const term = filterText.trim().toLowerCase();
+    const list = term ? currentEntries.filter(e => e.name.toLowerCase().includes(term)) : currentEntries;
+
+    if (!list.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5;
+      td.className = 'empty';
+      td.textContent = term ? 'No matching items.' : 'This folder is empty.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    for (const e of list) {
+      const tr = document.createElement('tr');
+
+      const tdName = document.createElement('td');
+      tdName.className = 'name';
+      const icon = document.createElement('span');
+      icon.className = 'icon';
+      icon.textContent = e.kind === 'directory' ? '📁' : '📄';
+      const nameBtn = document.createElement('button');
+      nameBtn.textContent = e.name;
+      nameBtn.style.all = 'unset';
+      nameBtn.style.cursor = 'pointer';
+      nameBtn.onclick = () => e.kind === 'directory' ? openDir(e) : previewFile(e);
+      tdName.append(icon, nameBtn);
+
+      const tdType = document.createElement('td');
+      tdType.textContent = e.type || (e.kind==='directory' ? 'Folder' : 'File');
+      const tdSize = document.createElement('td');
+      tdSize.className = 'right';
+      tdSize.textContent = e.kind === 'file' ? fmtSize(e.size) : '';
+      const tdDate = document.createElement('td');
+      tdDate.textContent = e.kind === 'file' ? fmtDate(e.mtime) : '';
+
+      const tdAct = document.createElement('td');
+      tdAct.className = 'right';
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn';
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => removeEntry(e);
+      tdAct.appendChild(delBtn);
+
+      tr.append(tdName, tdType, tdSize, tdDate, tdAct);
+      tbody.appendChild(tr);
+    }
+  }
+
+  async function previewFile(entry) {
+    // Simple download on click (no inline preview here)
+    const file = await entry.handle.getFile();
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = entry.name;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function ensureWrite(handle) {
+    // ask permission if needed
+    if (await handle.queryPermission?.({mode:'readwrite'}) === 'granted') return true;
+    const res = await handle.requestPermission?.({mode:'readwrite'});
+    return res === 'granted';
+  }
+
+  // ---- Actions ----
+  document.getElementById('pickBtn').onclick = async () => {
+    try {
+      rootHandle = await window.showDirectoryPicker({ id:'explorer-root' });
+      breadcrumb = [{ name: rootHandle.name || 'Root', handle: rootHandle }];
+      currentHandle = rootHandle;
+      currentEntries = await listDir(currentHandle);
+      renderPath(); renderRows();
+    } catch (e) { /* user canceled */ }
+  };
+
+  async function openDir(entry) {
+    breadcrumb.push({ name: entry.name, handle: entry.handle });
+    currentHandle = entry.handle;
+    currentEntries = await listDir(currentHandle);
+    renderPath(); renderRows();
+  }
+
+  async function openDirIndex(idx) {
+    breadcrumb = breadcrumb.slice(0, idx + 1);
+    currentHandle = breadcrumb[idx].handle;
+    currentEntries = await listDir(currentHandle);
+    renderPath(); renderRows();
+  }
+
+  async function removeEntry(entry) {
+    if (!currentHandle) return;
+    if (!(await ensureWrite(currentHandle))) return alert('Write permission denied.');
+    const ok = confirm(`Delete "${entry.name}"?`);
+    if (!ok) return;
+    try {
+      await currentHandle.removeEntry(entry.name, { recursive: entry.kind === 'directory' });
+      currentEntries = currentEntries.filter(e => e !== entry);
+      renderRows();
+    } catch (e) {
+      alert('Delete failed: ' + (e?.message || e));
+    }
+  }
+
+  // ---- Search (current folder only) ----
+  const q = document.getElementById('query');
+  document.getElementById('searchBtn').onclick = () => { filterText = q.value; renderRows(); };
+  document.getElementById('clearBtn').onclick = () => { q.value=''; filterText=''; renderRows(); };
+  q.addEventListener('keydown', e => { if (e.key === 'Enter') { filterText = q.value; renderRows(); } });
+</script>
+</body>
+</html>
