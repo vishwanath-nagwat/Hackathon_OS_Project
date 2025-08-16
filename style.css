@@ -56,6 +56,12 @@ body {
     }
 }
 
+.desktop {
+    position:fixed;
+        top:3rem;
+        left:3rem;  
+}
+
 .desktop-files {
     a {
         text-decoration:none;
@@ -122,11 +128,6 @@ body {
     .footer > a:hover {
         transform:translateY(-1rem);
     }
-}
-
-.header {
-    height:4rem;
-    background-color:rgba(25, 25, 25, 0.99);
 }
 
 /* Add these styles to your existing CSS file */
@@ -205,5 +206,64 @@ input[type="search"]::-webkit-search-cancel-button {
         img {
             width:8rem;
         }
+
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        text-decoration:none;
+        color:rgba(255, 255, 255, 0.716);
+        font-family:helvetica;
+        font-size:1.5rem;
+        gap:.7rem;
+    }
+}
+
+.header {
+    height:7rem;
+    background-color:rgba(0, 0, 0, 0.99);
+    /* background-color:red; */
+    display:flex;
+    justify-content:space-between;
+    padding-left:3rem;
+    align-items:center;
+    a > img {
+        color:white;
+        filter: invert(1);
+        width:2.2rem;
+    }
+
+    #clock {
+        color:white;
+        font-size:1.6rem;
+        font-family:helvetica;
+        text-align:center;
+        /* background-color:rgba(255, 255, 255, 0.395);
+        text-align:center;
+        border-radius:1rem;
+        padding-inline:2rem;
+        padding-block:1.5rem; */
+    /* box-shadow:rgba(255, 255, 255, 0.286) 0rem 0rem 10rem; */
+
+    }
+
+    .date {
+        color:white;
+    }
+    .panel {
+        display:flex;
+        gap:1.5rem;
+        background-color:rgba(255, 255, 255, 0.395);
+        text-align:center;
+        border-radius:1rem;
+        padding-inline:2rem;
+        padding-block:1rem;
+        margin-block:3rem;
+        margin-inline:1rem;
+        box-shadow:2rem -1rem 15rem white;
+    }
+    .clock-container {
+        display:flex;
+        align-items:center;
     }
 }
