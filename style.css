@@ -1,0 +1,209 @@
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html {
+    font-size:54.5%;
+}
+
+body {
+    width:100vw;
+    height:100vh;
+    background:url('https://images.unsplash.com/photo-1691083525349-c22d4dd2d567?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size:105%;
+}
+
+.wrap {
+    padding:3rem;
+    /* padding-top:0rem; */
+}
+.footer {
+    height:10rem;
+    background-color:white;
+    width:80rem;
+    position:fixed;
+    bottom:3rem;
+    left:50%;
+    transform: translate(-50%);
+    border-radius:20rem;
+    /* opacity:70%; */
+    background-color: rgba(255, 255, 255, 0.427);
+    box-shadow:rgba(255, 255, 255, 0.419) 0rem 0rem 10rem;
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(5px);
+    display:flex;
+    align-items:center;
+    padding-inline:2rem;
+    justify-content:space-evenly;
+    gap:2rem;
+
+    a {
+        img {
+            width:6rem;
+        }
+
+        transition-timing-function:ease;
+        transition-property: transform;
+        transition-duration:150ms;
+    }
+
+    a:hover {
+        transform:translateY(-1rem);
+    }
+}
+
+.desktop-files {
+    a {
+        text-decoration:none;
+        color:white;
+        font-family:helvetica;
+        font-size:1.2rem;
+        display:flex;
+        flex-direction:column;
+        align-items: center;
+        img {
+            width:8rem;
+        }
+
+        .chrome {
+            width:7.3rem;
+            margin-top:.5rem;
+            margin-bottom:1.2rem;
+        }
+
+        .computer {
+            width:9rem;
+            align-self:start;
+        }
+    }
+
+    display:grid;
+    grid-template-columns:10rem 10rem;
+    grid-template-rows:repeat(5, 10rem);
+    row-gap:3rem;
+    align-items:center;
+    justify-items:center;
+}
+
+.apps {
+    height:80rem;
+    background-color:white;
+    width:80rem;
+    position:fixed;
+    bottom:15rem;
+    left:50%;
+    transform: translate(-50%);
+    border-radius:4rem;
+    /* opacity:70%; */
+    background-color: rgba(255, 255, 255, 0.427);
+    box-shadow:rgba(255, 255, 255, 0.286) 0rem 0rem 10rem;
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(5px);
+    display:flex;
+    /* align-items:center; */
+    padding-inline:2rem;
+    justify-content:space-evenly;
+    gap:2rem;
+
+    .footer > a {
+        img {
+            width:6rem;
+        }
+
+        transition-timing-function:ease;
+        transition-property: transform;
+        transition-duration:150ms;
+    }
+
+    .footer > a:hover {
+        transform:translateY(-1rem);
+    }
+}
+
+.header {
+    height:4rem;
+    background-color:rgba(25, 25, 25, 0.99);
+}
+
+/* Add these styles to your existing CSS file */
+
+.apps {
+  height: 80rem;
+  width: 80rem;
+  position: fixed;
+  bottom: 15rem;
+  left: 50%;
+  transform: translate(-50%, 2rem) scale(0.95); /* start slightly lower */
+  border-radius: 4rem;
+  background-color: rgba(255, 255, 255, 0.427);
+  box-shadow: rgba(255, 255, 255, 0.286) 0rem 0rem 10rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction:column;
+  padding-inline: 2rem;
+  justify-content: flex-start;
+  align-items:center;
+  gap: 2rem;
+
+  /* Hidden state */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* disable clicks */
+  transition: 
+    opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    visibility 0s linear 0.25s; /* delay hiding until after fade */
+}
+
+/* Visible state */
+.apps.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0) scale(1);
+  transition: 
+    opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    visibility 0s linear 0s; /* show instantly */
+}
+
+.search {
+    width:65rem;
+    height:4.5rem;
+    background-color:transparent;
+    outline:none;
+    border:0;
+    /* border-radius:5rem; */
+    margin-top:5rem;
+    border-bottom:rgba(255, 255, 255, 0.462) solid .2rem;
+    color:white;
+    font-size:1.8rem;
+    padding-block:2.5rem;
+}
+
+input::placeholder {
+    font-family:helvetica;
+    color:white;
+    font-size:1.8rem;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance:none;
+}
+
+.applist {
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:5rem;
+
+    a {
+        img {
+            width:8rem;
+        }
+    }
+}

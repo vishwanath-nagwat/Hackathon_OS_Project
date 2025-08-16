@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- <div class="header"></div> -->
+    <div class="wrap">
+        <div class="desktop">
+            <div class="desktop-files">
+                <a href="#"><img src="images/computer.webp" class="computer" alt="">My Computer</a>
+                <a href="https://google.com"><img src="images/chrome.svg" class="chrome" alt="">Chrome</a>
+                <a href="#"><img src="images/folders.png" alt="">Documents</a>
+                <a href="#"><img src="images/folders.png" alt="">Downloads</a>
+                <a href="#"><img src="images/folders.png" alt="">Projects</a>
+                <a href="#"><img src="images/folders.png" alt="">Python Files</a>
+                <a href="#"><img src="images/file.png" alt="">index.html</a>
+                <a href="#"><img src="images/file.png" alt="">style.css</a>
+                <a href="#"><img src="images/file.png" alt="">queries.css</a>
+                <a href="#"><img src="images/fileblank.png" alt="">template</a>
+                <a href="#"><img src="images/fileblank.png" alt="">file</a>
+            </div>
+        </div>
+        <div class="footer">
+            <a href="apps.html"><img src="images/search.png" alt=""></a> 
+            <a href=""><img src="images/camera.png" alt=""></a>
+            <a href=""><img src="images/paint.png" alt=""></a>
+            <a href=""><img src="images/calculator.png" alt=""></a>
+            <a href="https://figma.com"><img src="images/figma.png" alt=""></a>
+            <a href=""><img src="images/music.png" alt=""></a>
+            <a href=""><img src="images/calander.png" alt=""></a>
+            <!-- <a href=""><img src="images/blender.png" alt=""></a> -->
+            <a href=""><img src="images/settings.png" alt=""></a>
+            <a href=""><img src="images/bin.png" alt=""></a>
+        </div>
+        <div class="apps">
+            <input type="search" class="search" placeholder="Search">
+            <br>
+            <div class="applist">   
+                <!-- <a href=""><img src="images/search.png" alt=""></a>  -->
+                <a href=""><img src="images/camera.png" alt="">Camera</a>
+                <a href=""><img src="images/messenger.png" alt="">Messenger</a>
+                <a href=""><img src="images/paint.png" alt="">Paint</a>
+                <a href="https://figma.com"><img src="images/figma.png" alt="">Figma</a>
+                <a href=""><img src="images/music.png" alt="">Music</a>
+                <a href=""><img src="images/chess.png" alt="">Chess</a>
+                <a href=""><img src="images/minecraft.png" alt="">Minecraft</a>
+                <a href=""><img src="images/puzzle.png" alt="">Puzzle</a>
+                <a href=""><img src="images/calander.png" alt="">Calander</a>
+                <a href=""><img src="images/clock.png" alt="">Clock</a>
+                <a href=""><img src="images/calculator.png" alt="">Calculator</a>
+                <a href=""><img src="images/location.png" alt="">Maps</a>
+                <a href=""><img src="images/photos.png" alt="">Photos</a>
+                <a href=""><img src="images/video.png" alt="">Videos</a>
+                <!-- <a href=""><img src="images/blender.png" alt=""></a> -->
+                <a href=""><img src="images/settings.png" alt=""></a>
+                <a href=""><img src="images/bin.png" alt=""></a>
+            </div>
+        </div>
+    </div>
+    <script>
+  const searchBtn = document.querySelector('.footer a:first-child'); // first icon in footer
+  const appsMenu = document.querySelector('.apps');
+
+  searchBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // prevent link navigation
+    appsMenu.classList.toggle('visible');
+  });
+</script>
+</body>
+</html>
